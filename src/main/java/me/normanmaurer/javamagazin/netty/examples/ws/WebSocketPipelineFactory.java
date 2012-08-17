@@ -1,7 +1,6 @@
 package me.normanmaurer.javamagazin.netty.examples.ws;
 
-import static org.jboss.netty.channel.Channels.*;
-
+import org.jboss.netty.channel.Channels;
 import org.jboss.netty.channel.ChannelHandler;
 import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.channel.ChannelPipelineFactory;
@@ -16,7 +15,7 @@ import org.jboss.netty.handler.codec.http.HttpResponseEncoder;
 public class WebSocketPipelineFactory implements ChannelPipelineFactory {
     public ChannelPipeline getPipeline() throws Exception {
         // Pipeline Object erstellen
-        ChannelPipeline pipeline = pipeline();
+        ChannelPipeline pipeline = Channels.pipeline();
         
         // Decoder der ChannelBuffer zu HttpRequest's umwandelt
         pipeline.addLast("reqDecoder", new HttpRequestDecoder());

@@ -1,10 +1,5 @@
 package me.normanmaurer.javamagazin.netty.examples.ws;
 
-import static org.jboss.netty.handler.codec.http.HttpHeaders.*;
-import static org.jboss.netty.handler.codec.http.HttpHeaders.Names.*;
-import static org.jboss.netty.handler.codec.http.HttpMethod.*;
-import static org.jboss.netty.handler.codec.http.HttpResponseStatus.*;
-import static org.jboss.netty.handler.codec.http.HttpVersion.*;
 
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
@@ -17,8 +12,11 @@ import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
 import org.jboss.netty.handler.codec.http.DefaultHttpResponse;
 import org.jboss.netty.handler.codec.http.HttpHeaders;
+import org.jboss.netty.handler.codec.http.HttpMethod;
 import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.HttpResponse;
+import org.jboss.netty.handler.codec.http.HttpResponseStatus;
+import org.jboss.netty.handler.codec.http.HttpVersion;
 import org.jboss.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import org.jboss.netty.handler.codec.http.websocketx.WebSocketServerHandshaker;
 import org.jboss.netty.handler.codec.http.websocketx.WebSocketServerHandshakerFactory;
@@ -46,19 +44,19 @@ public class WebSocketServerHandler extends SimpleChannelUpstreamHandler {
     private void handleHttpRequest(ChannelHandlerContext ctx, HttpRequest req) throws Exception {
         // Ueberpruefen ob der Request ein GET ist oder nicht, wenn nicht 
         // kann dieser nicht bearbeitet werden. Somit senden eines 403 codes
-        if (req.getMethod() != GET) {
-            sendHttpResponse(ctx, req, new DefaultHttpResponse(HTTP_1_1, FORBIDDEN));
+        if (req.getMethod() != HttpMethod.GET) {
+            sendHttpResponse(ctx, req, new DefaultHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.FORBIDDEN));
             return;
         }
 
         // Send the demo page and favicon.ico
         if (req.getUri().equals("/")) {
-            HttpResponse res = new DefaultHttpResponse(HTTP_1_1, OK);
+            HttpResponse res = new DefaultHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK);
 
             ChannelBuffer content = WebSocketServerIndexPage.getContent(getWebSocketLocation(req));
 
-            res.setHeader(CONTENT_TYPE, "text/html; charset=UTF-8");
-            setContentLength(res, content.readableBytes());
+            res.setHeader(HttpHeaders.Names.CONTENT_TYPE, "text/html; charset=UTF-8");
+            HttpHeaders.setContentLength(res, content.readableBytes());
 
             res.setContent(content);
             sendHttpResponse(ctx, req, res);
@@ -87,7 +85,7 @@ public class WebSocketServerHandler extends SimpleChannelUpstreamHandler {
             }
         } else {
             // Sende ein 404
-            HttpResponse res = new DefaultHttpResponse(HTTP_1_1, NOT_FOUND);
+            HttpResponse res = new DefaultHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.NOT_FOUND);
             sendHttpResponse(ctx, req, res);
         }
 
@@ -99,12 +97,12 @@ public class WebSocketServerHandler extends SimpleChannelUpstreamHandler {
         // Generate an error page if response status code is not OK (200).
         if (res.getStatus().getCode() != 200) {
             res.setContent(ChannelBuffers.copiedBuffer(res.getStatus().toString(), CharsetUtil.UTF_8));
-            setContentLength(res, res.getContent().readableBytes());
+            HttpHeaders.setContentLength(res, res.getContent().readableBytes());
         }
 
         // Senden der HttpResponse
         ChannelFuture f = ctx.getChannel().write(res);
-        if (!isKeepAlive(req) || res.getStatus().getCode() != 200) {
+        if (!HttpHeaders.isKeepAlive(req) || res.getStatus().getCode() != 200) {
             // falls der HttpRequest nicht den Keep-Alive header enthielt
             // oder der Code nicht 200 war wird der Channel nachdem die 
             // Nachricht geschrieben wird geschlossen
