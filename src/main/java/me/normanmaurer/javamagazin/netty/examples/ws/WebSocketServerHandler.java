@@ -3,13 +3,8 @@ package me.normanmaurer.javamagazin.netty.examples.ws;
 
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
-import org.jboss.netty.channel.ChannelFuture;
-import org.jboss.netty.channel.ChannelFutureListener;
-import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.channel.Channels;
-import org.jboss.netty.channel.ExceptionEvent;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
+import org.jboss.netty.channel.*;
+import org.jboss.netty.channel.group.ChannelGroup;
 import org.jboss.netty.handler.codec.http.DefaultHttpResponse;
 import org.jboss.netty.handler.codec.http.HttpHeaders;
 import org.jboss.netty.handler.codec.http.HttpMethod;
@@ -17,7 +12,6 @@ import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.HttpResponse;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.jboss.netty.handler.codec.http.HttpVersion;
-import org.jboss.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import org.jboss.netty.handler.codec.http.websocketx.WebSocketServerHandshaker;
 import org.jboss.netty.handler.codec.http.websocketx.WebSocketServerHandshakerFactory;
 import org.jboss.netty.util.CharsetUtil;
@@ -25,11 +19,18 @@ import org.jboss.netty.util.CharsetUtil;
 /**
  * {@link SimpleChannelUpstreamHandler} implementation der den WebSocket Handshake durchfuert
  * sowie das Abhandeln von {@link HttpRequest}'s.
+ * 
+ * @author Norman Maurer <norman@apache.org>
  */
 public class WebSocketServerHandler extends SimpleChannelUpstreamHandler {
 
     private static final String WEBSOCKET_PATH = "/ws";
-
+    private final ChannelGroup wsGroup;
+    
+    public WebSocketServerHandler(ChannelGroup wsGroup) {
+        this.wsGroup = wsGroup;
+    }
+    
     @Override
     public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
         Object msg = e.getMessage();
@@ -41,7 +42,7 @@ public class WebSocketServerHandler extends SimpleChannelUpstreamHandler {
         }
     }
 
-    private void handleHttpRequest(ChannelHandlerContext ctx, HttpRequest req) throws Exception {
+    private void handleHttpRequest(ChannelHandlerContext ctx, HttpRequest req) throws Exception {        
         // Ueberpruefen ob der Request ein GET ist oder nicht, wenn nicht 
         // kann dieser nicht bearbeitet werden. Somit senden eines 403 codes
         if (req.getMethod() != HttpMethod.GET) {
@@ -75,7 +76,9 @@ public class WebSocketServerHandler extends SimpleChannelUpstreamHandler {
                     @Override
                     public void operationComplete(ChannelFuture future) throws Exception {
                         if(future.isSuccess()) {
-                            future.getChannel().write(new TextWebSocketFrame("WS connection established!"));
+                            // Handshake war erfolgreich. Fuege Channel in die ChannelGroup hinzu
+                            // um so auch UDP Nachrichten zu empfangen
+                            wsGroup.add(future.getChannel());
                         } else {
                             // Handshake hat nicht geklappt. Feuere ein exceptionCaught event
                             Channels.fireExceptionCaught(future.getChannel(), future.getCause());
@@ -87,6 +90,7 @@ public class WebSocketServerHandler extends SimpleChannelUpstreamHandler {
             // Sende ein 404
             HttpResponse res = new DefaultHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.NOT_FOUND);
             sendHttpResponse(ctx, req, res);
+            
         }
 
        
