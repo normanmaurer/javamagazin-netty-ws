@@ -22,6 +22,7 @@ public class WebSocketPipelineFactory implements ChannelPipelineFactory {
         this.group = group;
     }
     
+    @Override
     public ChannelPipeline getPipeline() throws Exception {
         // Pipeline Object erstellen
         ChannelPipeline pipeline = Channels.pipeline();

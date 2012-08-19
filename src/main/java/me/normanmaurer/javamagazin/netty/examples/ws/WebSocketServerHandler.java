@@ -96,7 +96,6 @@ public class WebSocketServerHandler extends SimpleChannelUpstreamHandler {
        
     }
 
-
     private static void sendHttpResponse(ChannelHandlerContext ctx, HttpRequest req, HttpResponse res) {
         // Generate an error page if response status code is not OK (200).
         if (res.getStatus().getCode() != 200) {
