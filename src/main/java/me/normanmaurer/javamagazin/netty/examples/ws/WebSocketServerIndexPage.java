@@ -9,6 +9,12 @@ public final class WebSocketServerIndexPage {
 
     private static final String NEWLINE = "\r\n";
 
+    /**
+     * Gebe Index.html als {@link ChannelBuffer} zurueck
+     * 
+     * @param webSocketLocation
+     * @return html
+     */
     public static ChannelBuffer getContent(String webSocketLocation) {
         return ChannelBuffers.copiedBuffer(
                 "<html><head><title>Web Socket Nachrichten Beispiel</title></head>" + NEWLINE +

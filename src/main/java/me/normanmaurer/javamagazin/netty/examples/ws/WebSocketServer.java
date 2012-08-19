@@ -10,7 +10,8 @@ import org.jboss.netty.channel.socket.nio.NioDatagramChannelFactory;
 import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
 
 public class WebSocketServer {
-
+    // Dieser Gruppe werden alle WebSocket client Verbindungen zu gefuegt
+    // um somit eine einfache Kommunikation an alle zu ermoeglichen
     private final ChannelGroup group = new DefaultChannelGroup();
     private final int udpPort;
     private final int port;
@@ -25,10 +26,17 @@ public class WebSocketServer {
      * 
      */
     public void startUp() {
+        // Bereite den UDP/Datagram Channel vor
         ConnectionlessBootstrap udpBootstrap = new ConnectionlessBootstrap(new NioDatagramChannelFactory());
+
+        // Setzen der WebSocketBroadcastPipelineFactory die das Senden von UDP
+        // Nachrichten an die WebSocket Clients uebernimmt
         udpBootstrap.setPipelineFactory(new WebSocketBroadcastPipelineFactory(group));
+
+        // Binden des Sockets der die UDP Nachrichten entgegennimmt
         udpBootstrap.bind(new InetSocketAddress(udpPort));
         
+
         // Bereite den Channel vor
         ServerBootstrap bootstrap = new ServerBootstrap(new NioServerSocketChannelFactory());
 
