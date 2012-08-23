@@ -16,30 +16,32 @@ public final class WebSocketServerIndexPage {
      * @return html
      */
     public static ChannelBuffer getContent(String webSocketLocation) {
-        return ChannelBuffers.copiedBuffer(
-                "<html><head><title>Web Socket Nachrichten Beispiel</title></head>" + NEWLINE +
-                "<body>" + NEWLINE +
-                "<script type=\"text/javascript\">" + NEWLINE +
-                "var socket;" + NEWLINE +
-                "if (!window.WebSocket) {" + NEWLINE +
-                "  window.WebSocket = window.MozWebSocket;" + NEWLINE +
-                "}" + NEWLINE +
-                "if (window.WebSocket) {" + NEWLINE +
-                "  socket = new WebSocket(\"" + webSocketLocation + "\");" + NEWLINE +
-                "  socket.onmessage = function(event) {" + NEWLINE +
-                "    var ta = document.getElementById('msgs');" + NEWLINE +
-                "    ta.value = ta.value + event.data" +
-                "  };" + NEWLINE +
-                "} else {" + NEWLINE +
-                "  alert(\"Web-Browser unterstuetzt keine WebSockets!\");" + NEWLINE +
-                "}" + NEWLINE +
-                NEWLINE +
-                "</script>" + NEWLINE +
-                "<h3>Nachrichten:</h3>" + NEWLINE +
-                "<textarea id=\"msgs\" style=\"width:500px;height:300px;\"></textarea>" + NEWLINE +
-                "</form>" + NEWLINE +
-                "</body>" + NEWLINE +
-                "</html>" + NEWLINE, CharsetUtil.US_ASCII);
+        StringBuilder page = new StringBuilder();
+        page.append("<html><head><title>Web Socket Nachrichten Beispiel</title></head>").append(NEWLINE);
+        page.append("<body>").append(NEWLINE);
+        page.append("<script type=\"text/javascript\">").append(NEWLINE);
+        page.append("var socket;").append(NEWLINE);
+        page.append("if (!window.WebSocket) {").append(NEWLINE);
+        page.append("  window.WebSocket = window.MozWebSocket;").append(NEWLINE);
+        page.append("}").append(NEWLINE);
+        page.append("if (window.WebSocket) {").append(NEWLINE);
+        page.append("  socket = new WebSocket(\"" + webSocketLocation + "\");").append(NEWLINE);
+        page.append("  socket.onmessage = function(event) {").append(NEWLINE);
+        page.append("    var ta = document.getElementById('msgs');").append(NEWLINE);
+        page.append("    ta.value = ta.value + event.data;").append(NEWLINE);
+        page.append("  };").append(NEWLINE);
+        page.append("} else {").append(NEWLINE);
+        page.append("  alert(\"Web-Browser unterstuetzt keine WebSockets!\");").append(NEWLINE);
+        page.append("}").append(NEWLINE);
+        page.append(NEWLINE);
+        page.append("</script>").append(NEWLINE);
+        page.append("<h3>Nachrichten:</h3>").append(NEWLINE);
+        page.append("<textarea id=\"msgs\" style=\"width:500px;height:300px;\"></textarea>").append(NEWLINE);
+        page.append("</body>").append(NEWLINE);
+        page.append("</html>").append(NEWLINE);
+        
+        return ChannelBuffers.copiedBuffer(page.toString(), CharsetUtil.US_ASCII);
+
     }
 
     private WebSocketServerIndexPage() {
