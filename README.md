@@ -8,5 +8,5 @@ Starten des Servers
 Der Server kann via mvn gestartet werden. Hierbei kann -DwsPort= und -DudpPort= verwendet werden um den 
 jeweiligen Port zu spezifizieren.
 
-# mvn exec:exec -DwsPort=8888 -DudpPort=9999
+\# mvn exec:exec -DwsPort=8888 -DudpPort=9999
 
