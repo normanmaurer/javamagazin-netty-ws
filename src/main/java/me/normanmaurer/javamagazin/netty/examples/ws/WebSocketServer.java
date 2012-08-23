@@ -50,6 +50,15 @@ public class WebSocketServer {
     }
 
     public static void main(String[] args) {
-        new WebSocketServer(8888, 9999).startUp();
+        int wsPort;
+        int udpPort;
+        if (args.length < 2) {
+            wsPort = 8888;
+            udpPort = 9999;
+        } else {
+            wsPort = Integer.parseInt(args[0]);
+            udpPort = Integer.parseInt(args[1]);
+        }
+        new WebSocketServer(wsPort, udpPort).startUp();
     }
 }
