@@ -36,17 +36,16 @@ public class WebSocketServer {
         // Binden des Sockets der die UDP Nachrichten entgegennimmt
         udpBootstrap.bind(new InetSocketAddress(udpPort));
         
-
         // Bereite den Channel vor
         ServerBootstrap bootstrap = new ServerBootstrap(new NioServerSocketChannelFactory());
 
-        // Setzen der WebSocketPipelineFactory die das bearbeiten von HTTP 
-        //und WebSockets uebernimmt
+        // Setzen der WebSocketPipelineFactory, die das Bearbeiten von HTTP 
+        //und WebSocket Requests uebernimmt
         bootstrap.setPipelineFactory(new WebSocketPipelineFactory(group));
 
-        // Binden des Sockets der nun bereit ist requests engegen zu nehmen
+        // Binden des Sockets der nun bereit ist Requests entgegen zu nehmen
         bootstrap.bind(new InetSocketAddress(port));
-        
+
     }
 
     public static void main(String[] args) {

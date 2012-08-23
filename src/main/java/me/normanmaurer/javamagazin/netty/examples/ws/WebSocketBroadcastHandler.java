@@ -23,10 +23,10 @@ public class WebSocketBroadcastHandler extends SimpleChannelUpstreamHandler {
     public WebSocketBroadcastHandler(ChannelGroup wsGroup) {
         this.wsGroup = wsGroup;
     }
-    
+
     @Override
     public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
-        // Sendet der empfangenen UDP Nachricht an alle verbundenen WebSockets clients
+        // Senden der empfangenen UDP Nachricht an alle verbundenen WebSocket Clients
         wsGroup.write(new TextWebSocketFrame((ChannelBuffer)e.getMessage()));
     }
 

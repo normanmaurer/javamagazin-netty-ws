@@ -17,7 +17,7 @@ import org.jboss.netty.channel.group.ChannelGroup;
 public class WebSocketBroadcastPipelineFactory implements ChannelPipelineFactory{
 
     private final ChannelGroup group;
-    
+
     public WebSocketBroadcastPipelineFactory(ChannelGroup group) {
         this.group = group;
     }
@@ -27,3 +27,4 @@ public class WebSocketBroadcastPipelineFactory implements ChannelPipelineFactory
         return Channels.pipeline(new WebSocketBroadcastHandler(group));
     }
 }
+

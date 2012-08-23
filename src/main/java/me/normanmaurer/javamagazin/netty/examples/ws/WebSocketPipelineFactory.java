@@ -33,10 +33,10 @@ public class WebSocketPipelineFactory implements ChannelPipelineFactory {
         // Aggregator der HttpChunks' in HttpRequest's aggregiert
         pipeline.addLast("chunkAggregator", new HttpChunkAggregator(65536));
         
-        // Encoder der HttpResponse's zu ChannellBuffer umwandelt
+        // Encoder der HttpResponse's zu ChannelBuffer umwandelt
         pipeline.addLast("reqEncoder", new HttpResponseEncoder());
         
-        // Handler der richtigen WebSocket Handshaker einfuegt
+        // Handler der den richtigen WebSocket Handshaker einfuegt
         // und die Index-Seite zur Verfügung stellt
         pipeline.addLast("handler", new WebSocketServerHandler(group));
         return pipeline;

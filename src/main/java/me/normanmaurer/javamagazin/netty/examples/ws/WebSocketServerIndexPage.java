@@ -1,4 +1,3 @@
-
 package me.normanmaurer.javamagazin.netty.examples.ws;
 
 import org.jboss.netty.buffer.ChannelBuffer;

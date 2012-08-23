@@ -37,20 +37,20 @@ public class WebSocketServerHandler extends SimpleChannelUpstreamHandler {
         if (msg instanceof HttpRequest) {
             handleHttpRequest(ctx, (HttpRequest) msg);
         } else {
-            // Ungueltige Message, somit schliesen des Channel's
+            // Ungueltige Nachricht, somit schliessen des Channel's
             ctx.getChannel().close();
         }
     }
 
     private void handleHttpRequest(ChannelHandlerContext ctx, HttpRequest req) throws Exception {        
         // Ueberpruefen ob der Request ein GET ist oder nicht, wenn nicht 
-        // kann dieser nicht bearbeitet werden. Somit senden eines 403 codes
+        // kann dieser nicht bearbeitet werden. Somit senden eines 403 Status-Code‘s
         if (req.getMethod() != HttpMethod.GET) {
             sendHttpResponse(ctx, req, new DefaultHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.FORBIDDEN));
             return;
         }
 
-        // Send the demo page and favicon.ico
+        // Senden der Index-Seite
         if (req.getUri().equals("/")) {
             HttpResponse res = new DefaultHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK);
 
@@ -66,8 +66,8 @@ public class WebSocketServerHandler extends SimpleChannelUpstreamHandler {
             WebSocketServerHandshakerFactory wsFactory = new WebSocketServerHandshakerFactory(
                     getWebSocketLocation(req), null, false);
             WebSocketServerHandshaker handshaker = wsFactory.newHandshaker(req);
-            // Ueberpruefen ob ein geeigneter WebSocketServerHandshaker fuer den request
-            // gefunden worden konnte. wenn nicht wird der client darueber informiert
+            // Ueberpruefen ob ein geeigneter WebSocketServerHandshaker fuer den Request
+            // gefunden worden konnte. Wenn nicht wird der Client darueber informiert
             if (handshaker == null) {
                 wsFactory.sendUnsupportedWebSocketVersionResponse(ctx.getChannel());
             } else {
@@ -76,11 +76,13 @@ public class WebSocketServerHandler extends SimpleChannelUpstreamHandler {
                     @Override
                     public void operationComplete(ChannelFuture future) throws Exception {
                         if(future.isSuccess()) {
-                            // Handshake war erfolgreich. Fuege Channel in die ChannelGroup hinzu
-                            // um so auch UDP Nachrichten zu empfangen
+                            // Handshake war erfolgreich. Fuege Channel in die 
+                            // ChannelGroup hinzu um so auch UDP Nachrichten
+                            // zu Empfangen
                             wsGroup.add(future.getChannel());
                         } else {
-                            // Handshake hat nicht geklappt. Feuere ein exceptionCaught event
+                            // Handshake hat nicht geklappt. Feuere einen
+                            // exceptionCaught event
                             Channels.fireExceptionCaught(future.getChannel(), future.getCause());
                         }
                     }
@@ -97,7 +99,7 @@ public class WebSocketServerHandler extends SimpleChannelUpstreamHandler {
     }
 
     private static void sendHttpResponse(ChannelHandlerContext ctx, HttpRequest req, HttpResponse res) {
-        // Generate an error page if response status code is not OK (200).
+        // Erzeugen einer “Error-Page” wenn Status-Code nicht OK (200) ist.
         if (res.getStatus().getCode() != 200) {
             res.setContent(ChannelBuffers.copiedBuffer(res.getStatus().toString(), CharsetUtil.UTF_8));
             HttpHeaders.setContentLength(res, res.getContent().readableBytes());
@@ -106,16 +108,16 @@ public class WebSocketServerHandler extends SimpleChannelUpstreamHandler {
         // Senden der HttpResponse
         ChannelFuture f = ctx.getChannel().write(res);
         if (!HttpHeaders.isKeepAlive(req) || res.getStatus().getCode() != 200) {
-            // falls der HttpRequest nicht den Keep-Alive header enthielt
-            // oder der Code nicht 200 war wird der Channel nachdem die 
-            // Nachricht geschrieben wird geschlossen
+            // Galls der HttpRequest nicht den Keep-Alive Geader enthielt
+            // oder der Status-Code nicht 200 war wird der Channel nach dem 
+            // Senden der Nachricht geschlossen
             f.addListener(ChannelFutureListener.CLOSE);
         }
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) throws Exception {
-        // Stacktrace nach STDOUT senden und Channel schliesen
+        // Stacktrace nach STDOUT ausgeben und Channel schliessen
         e.getCause().printStackTrace();
         e.getChannel().close();
     }
@@ -124,3 +126,4 @@ public class WebSocketServerHandler extends SimpleChannelUpstreamHandler {
         return "ws://" + req.getHeader(HttpHeaders.Names.HOST) + WEBSOCKET_PATH;
     }
 }
+
